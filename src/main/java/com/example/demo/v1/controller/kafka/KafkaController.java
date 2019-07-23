@@ -46,7 +46,7 @@ public class KafkaController {
      * 消费信息
      */
     @RequestMapping("/get")
-    public Map<String, String> testKafkaGet(){
+    public String testKafkaGet(){
         Map<String,String> map = new HashMap<>(16);
         Properties props = new Properties();
         props.put("bootstrap.servers", "localhost:9092");
@@ -60,12 +60,18 @@ public class KafkaController {
         KafkaConsumer<String,String> consumer = new KafkaConsumer<>(props);
        //订阅主题列表topic
         consumer.subscribe(Arrays.asList("test","__consumer_offsets"));
-        while (true) {
-            ConsumerRecords<String, String> records = consumer.poll(100);
-            for (ConsumerRecord<String, String> record : records) {
-//                System.out.printf("offset = %d, key = %s, value = %s", record.offset(), record.key(), record.value()+"\n");
+//        while (true) {
+//            ConsumerRecords<String, String> records = consumer.poll(100);
+//            for (ConsumerRecord<String, String> record : records) {
+////                System.out.printf("offset = %d, key = %s, value = %s", record.offset(), record.key(), record.value()+"\n");
+//                map.put(record.key(), record.value());
+//            }
+//        }
+
+        ConsumerRecords<String, String> records = consumer.poll(100);
+        for (ConsumerRecord<String, String> record : records) {
                 map.put(record.key(), record.value());
-            }
         }
+        return map.toString();
     }
 }
