@@ -1,11 +1,14 @@
 package com.example.demo.v1.controller.kafka;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +21,7 @@ import java.util.Properties;
 @RestController
 @RequestMapping("/kafka")
 @Slf4j
+@Api(tags = "kafka")
 public class KafkaController {
 
     @Resource
@@ -27,7 +31,8 @@ public class KafkaController {
      * 生产信息
      * @return
      */
-    @RequestMapping("/test")
+    @ApiOperation(value = "get message")
+    @GetMapping("/test")
     public String testKafka() {
         int iMax = 100;
         for (int i = 1; i < iMax; i++) {
@@ -45,7 +50,8 @@ public class KafkaController {
     /**
      * 消费信息
      */
-    @RequestMapping("/get")
+    @ApiOperation(value = "receiver message")
+    @GetMapping("/get")
     public String testKafkaGet(){
         Map<String,String> map = new HashMap<>(16);
         Properties props = new Properties();
