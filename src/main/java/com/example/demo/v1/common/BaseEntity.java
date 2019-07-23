@@ -1,4 +1,4 @@
-package com.example.demo.v1.common.domain;
+package com.example.demo.v1.common;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
