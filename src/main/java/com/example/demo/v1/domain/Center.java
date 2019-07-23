@@ -1,6 +1,6 @@
 package com.example.demo.v1.domain;
 
-import com.example.demo.v1.common.domain.BaseEntity;
+import com.example.demo.v1.common.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
