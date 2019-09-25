@@ -1,4 +1,4 @@
-package com.example.demo.v1.patterns;
+package com.example.demo.v1.common;
 
 /**
  * 工厂模式-根据className获取具体的工厂实体
