@@ -1,159 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- configuration file for LogBack (slf4J implementation)
-See here for more details: http://gordondickens.com/wordpress/2013/03/27/sawing-through-the-java-loggers/ -->
-<configuration scan="true" scanPeriod="30 seconds">
-
-  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
-    <resetJUL>true</resetJUL>
-  </contextListener>
-
-  <property name="LOG_HOME" value="/logs" />
-  <property name="DETAILED_PATTERN" value="|%d{yy-MM-dd HH:mm:ss.SSS}| %-5level [%thread] %logger{30} GUID:%X{user.guid:-N/A} LOCALID:%X{user.localid:-N/A} CODE:%X{user.code:-N/A} SESSION:%X{user.sessionid:-N/A} %msg%n{}" />
-  <property name="DEFAULT_PATTERN" value="|%d{yy-MM-dd HH:mm:ss.SSS}| %-5level [%thread] %logger{30} %msg%n{}" />
-
-  <!-- To enable JMX Management -->
-  <jmxConfigurator/>
-
-  <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>INFO</level>
-    </filter>
+<configuration>
+  <!-- %m输出的信息,%p日志级别,%t线程名,%d日期,%c类的全名,%i索引【从数字0开始递增】,,, -->
+  <!-- appender是configuration的子节点，是负责写日志的组件。 -->
+  <!-- ConsoleAppender：把日志输出到控制台 -->
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>${DEFAULT_PATTERN}</pattern>
+      <pattern>%d %p (%file:%line\)- %m%n</pattern>
+      <!-- 控制台也要使用UTF-8，不要使用GBK，否则会中文乱码 -->
+      <charset>UTF-8</charset>
     </encoder>
   </appender>
-
-  <!-- 全量日志 -->
-  <appender name="ALL" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${LOG_HOME}/all.log</file>
+  <!-- RollingFileAppender：滚动记录文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件 -->
+  <!-- 以下的大概意思是：1.先按日期存日志，日期变了，将前一天的日志文件名重命名为XXX%日期%索引，新的日志仍然是server.log -->
+  <!--             2.如果日期没有发生变化，但是当前日志的文件大小超过1KB时，对当前日志进行分割 重命名-->
+  <appender name="serverlog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>logs/server.log</File>
+    <!-- rollingPolicy:当发生滚动时，决定 RollingFileAppender 的行为，涉及文件移动和重命名。 -->
+    <!-- TimeBasedRollingPolicy： 最常用的滚动策略，它根据时间来制定滚动策略，既负责滚动也负责出发滚动 -->
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <!--日志文件输出的文件名-->
-      <fileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}_all.log</fileNamePattern>
-      <maxHistory>60</maxHistory>
-    </rollingPolicy>
-    <encoder>
-      <!--格式化输出：%d表示日期，%thread表示线程名，%level 等级 %msg：日志消息，%n是换行符-->
-      <pattern>${DETAILED_PATTERN}</pattern>
-    </encoder>
-    <!--日志文件最大的大小-->
-    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-      <maxFileSize>10MB</maxFileSize>
-    </triggeringPolicy>
-  </appender>
-
-  <!-- 按照每天生成日志文件 -->
-  <appender name="DebugFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${LOG_HOME}/debug.log</file>
-    <filter class="ch.qos.logback.classic.filter.LevelFilter">
-      <level>DEBUG</level>
-    </filter>
-    <filter class="ch.qos.logback.classic.filter.LevelFilter">
-      <level>WARN</level>
-      <onMatch>DENY</onMatch>
-      <onMismatch>NEUTRAL</onMismatch>
-    </filter>
-    <filter class="ch.qos.logback.classic.filter.LevelFilter">
-      <level>ERROR</level>
-      <onMatch>DENY</onMatch>
-      <onMismatch>NEUTRAL</onMismatch>
-    </filter>
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <!--日志文件输出的文件名-->
-      <fileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}_debug.log</fileNamePattern>
-      <maxHistory>60</maxHistory>
-    </rollingPolicy>
-    <encoder>
-      <!--格式化输出：%d表示日期，%thread表示线程名，%level 等级 %msg：日志消息，%n是换行符-->
-      <pattern>${DEFAULT_PATTERN}</pattern>
-    </encoder>
-    <!--日志文件最大的大小-->
-    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-      <maxFileSize>10MB</maxFileSize>
-    </triggeringPolicy>
-  </appender>
-
-  <appender name="InfoFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${LOG_HOME}/info.log</file>
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>INFO</level>
-    </filter>
-
-    <!-- 可让每天产生一个日志文件，最多 10 个，自动回滚 -->
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}_info.log</fileNamePattern>
+      <!-- 活动文件的名字会根据fileNamePattern的值，每隔一段时间改变一次 -->
+      <!-- 文件名：log/server.2017-12-05.0.log -->
+      <fileNamePattern>logs/server.%d.%i.log</fileNamePattern>
+      <!-- 每产生一个日志文件，该日志文件的保存期限为30天 -->
       <maxHistory>30</maxHistory>
-    </rollingPolicy>
-    <layout class="ch.qos.logback.classic.PatternLayout" charset="UTF-8">
-      <!--格式化输出：%d表示日期，%thread表示线程名，%level 等级 %msg：日志消息，%n是换行符-->
-      <pattern>${DEFAULT_PATTERN}</pattern>
-    </layout>
-    <!--日志文件最大的大小-->
-    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-      <maxFileSize>10MB</maxFileSize>
-    </triggeringPolicy>
-  </appender>
-
-  <!-- 按照每天生成日志文件 -->
-  <appender name="ErrorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${LOG_HOME}/error.log</file>
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>ERROR</level>
-    </filter>
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <!--日志文件输出的文件名-->
-      <fileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}_error.log</fileNamePattern>
-      <maxHistory>10</maxHistory>
+      <timeBasedFileNamingAndTriggeringPolicy  class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <!-- maxFileSize:这是活动文件的大小，默认值是10MB，测试时可改成1KB看效果 -->
+        <maxFileSize>10MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
     </rollingPolicy>
     <encoder>
-      <!--格式化输出：%d表示日期，%thread表示线程名，%level 等级 %msg：日志消息，%n是换行符-->
-      <pattern>${DETAILED_PATTERN}STACKTRACE ATTACHED:%n%xEx</pattern>
+      <!-- pattern节点，用来设置日志的输入格式 -->
+      <pattern>
+        %d %p (%file:%line\)- %m%n
+      </pattern>
+      <!-- 记录日志的编码:此处设置字符集 - -->
+      <charset>UTF-8</charset>
     </encoder>
-    <!--日志文件最大的大小-->
-    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-      <maxFileSize>10MB</maxFileSize>
-    </triggeringPolicy>
   </appender>
-
-  <appender name="MonitorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${LOG_HOME}/monitor.log</file>
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>INFO</level>
-    </filter>
-
-    <!-- 可让每天产生一个日志文件，最多 10 个，自动回滚 -->
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}_monitor.log</fileNamePattern>
-      <maxHistory>30</maxHistory>
-    </rollingPolicy>
-    <encoder>
-      <!--格式化输出：%d表示日期，%thread表示线程名，%level 等级 %msg：日志消息，%n是换行符-->
-      <pattern>${DEFAULT_PATTERN}</pattern>
-    </encoder>
-    <!--日志文件最大的大小-->
-    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-      <maxFileSize>10MB</maxFileSize>
-    </triggeringPolicy>
-  </appender>
-
-  <!-- 输出到控制台和文件，可定义更多的 Appender -->
-  <root>
-    <level value="INFO" />
-    <appender-ref ref="DebugFile" />
-    <appender-ref ref="ErrorFile" />
-    <appender-ref ref="InfoFile" />
-    <appender-ref ref="ALL" />
+  <!-- 控制台输出日志级别 -->
+  <root level="info">
+    <appender-ref ref="STDOUT" />
   </root>
-
-  <!-- 下面配置一些第三方包的日志过滤级别，用于避免刷屏 -->
-  <logger name="org" level="WARN" />
-  <logger name="com.mchange.v2" level="WARN" />
-  <logger name="ch.qos.logback" level="WARN" />
-  <logger name="org.hibernate" level="WARN" />
-  <logger name="com.sun.xml.internal" level="WARN" />
-  <logger name="druid" level="INFO"/>
-
-  <logger name="com.sysjj.monitor" level="DEBUG" additivity="false">
-    <appender-ref ref="MonitorFile" />
+  <!-- 指定项目中某个包，当有日志操作行为时的日志记录级别 -->
+  <!-- com.liyan为根包，也就是只要是发生在这个根包下面的所有日志操作行为的权限都是DEBUG -->
+  <!-- 级别依次为【从高到低】：FATAL > ERROR > WARN > INFO > DEBUG > TRACE  -->
+  <logger name="com.example.demo" level="DEBUG">
+    <appender-ref ref="serverlog" />
   </logger>
-
 </configuration>
