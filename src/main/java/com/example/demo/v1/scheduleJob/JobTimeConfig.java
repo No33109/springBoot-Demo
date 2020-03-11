@@ -15,7 +15,7 @@ public class JobTimeConfig {
     private ApplicationContext applicationContext;
 
     public void findAllClassByInterface(Class c){
-        Collection<BaseJob> jobList=new LinkedList<>(applicationContext.getBeansOfType(BaseJob.class).values());
+        Collection<BaseJob> jobList=new LinkedList<>(applicationContext.getBeansOfType(c).values());
         if(!CollectionUtils.isEmpty(jobList)){
             jobList.forEach(j-> System.out.println(j.getClass().getName()));
         }
