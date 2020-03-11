@@ -10,8 +10,9 @@ public class TestJob implements BaseJob {
     @Autowired
     private JobTimeConfig jobTimeConfig;
 
+
     @Override
-    @Scheduled(cron = "0 0/1 * * * ? ")
+    @Scheduled(cron = "${com.example.demo.v1.scheduleJob.TestJob}")
     public void process() {
         System.out.println("定时----");
         jobTimeConfig.findAllClassByInterface(BaseJob.class);

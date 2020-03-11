@@ -10,7 +10,7 @@ public class JobAdmin {
     @Autowired
    private  JobTimeConfig jobTimeConfig;
 
-    @Scheduled(cron = "0/30 * * * * ? ")
+    @Scheduled(cron = "${admin.job.corn}")
     public void handleAllJob(){
         try {
             jobTimeConfig.findAllClassByInterface(BaseJob.class);
