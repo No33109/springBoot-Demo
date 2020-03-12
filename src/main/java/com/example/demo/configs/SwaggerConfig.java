@@ -29,7 +29,7 @@ public class SwaggerConfig {
                 .title("spring boot demo")
                 .description("spring boot demo swagger")
                 .license("demo-v1")
-                .licenseUrl("http://localhost:8082/demo")
+                .licenseUrl("http://localhost:8082/demo/swagger-ui.html")
                 .build();
     }
 }
