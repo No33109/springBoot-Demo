@@ -18,6 +18,7 @@ public class TestJob implements BaseJob {
     @Override
     @Scheduled(cron = "${com.example.demo.v1.scheduleJob.TestJob}")
     public void process() {
+        logger.warn("TestJob process start");
 //        System.out.println("定时----");
 //        jobTimeConfig.findAllClassByInterface(BaseJob.class);
     }
