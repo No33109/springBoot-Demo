@@ -43,7 +43,7 @@ public class ServerSocketChannelDemo implements Runnable{
             selector.select(1000);
             Set<SelectionKey> selectionKeys = selector.selectedKeys();
             Iterator<SelectionKey> iterator = selectionKeys.iterator();
-            SelectionKey next = null;
+            SelectionKey next;
             while (iterator.hasNext()){
                next = iterator.next();
                iterator.remove();
@@ -77,7 +77,6 @@ public class ServerSocketChannelDemo implements Runnable{
                 channel.register(selector,SelectionKey.OP_READ);
 
             }
-
             if(key.isReadable()){
                 SocketChannel channel = (SocketChannel)key.channel();
                 ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
